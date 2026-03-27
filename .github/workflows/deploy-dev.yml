@@ -35,7 +35,7 @@ jobs:
       - uses: databricks/setup-cli@main
 
       - name: Deploy bundle to dev
-        run: databricks bundle deploy --target dev
+        run: databricks bundle deploy --target dev --auto-approve
         env:
           DATABRICKS_HOST: ${{ secrets.DEV_WORKSPACE_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DEV_WORKSPACE_TOKEN }}
