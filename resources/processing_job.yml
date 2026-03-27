@@ -1,0 +1,44 @@
+resources:
+  jobs:
+    silver_layer_processing:
+      name: "ZebPay - Silver Layer Processing [${bundle.target}]"
+      tasks:
+        - task_key: run_lakeflow_ingestion
+          description: Trigger Lakeflow Connect ingestion pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.lakeflow_connect_ingestion.id}
+            full_refresh: false
+
+        - task_key: run_dlt_silver
+          description: Run DLT bronze-to-silver transformations
+          depends_on:
+            - task_key: run_lakeflow_ingestion
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.bronze_to_silver.id}
+            full_refresh: false
+
+        - task_key: process_silver_secured
+          description: Process and merge into silver_secured tables with ABAC
+          depends_on:
+            - task_key: run_dlt_silver
+          notebook_task:
+            notebook_path: ../src/notebooks/03_silver_processing.py
+            source: WORKSPACE
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            num_workers: 1
+            node_type_id: ${var.node_type_id}
+            data_security_mode: USER_ISOLATION
+            runtime_engine: PHOTON
+
+      schedule:
+        quartz_cron_expression: "0 0/30 * * * ?"
+        timezone_id: Asia/Kolkata
+        pause_status: PAUSED
+
+      max_concurrent_runs: 1
+      tags:
+        project: zebpay
+        environment: ${var.environment}
+        team: data-engineering
+        managed_by: databricks-asset-bundles

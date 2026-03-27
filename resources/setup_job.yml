@@ -1,0 +1,28 @@
+resources:
+  jobs:
+    setup_catalog_and_abac:
+      name: "ZebPay - Setup Catalog & ABAC [${bundle.target}]"
+      tasks:
+        - task_key: setup
+          description: Create ABAC functions and apply policies
+          notebook_task:
+            notebook_path: ../src/notebooks/00_setup_catalog_and_abac.py
+            base_parameters:
+              catalog: ${var.catalog}
+              environment: ${var.environment}
+            source: WORKSPACE
+          new_cluster:
+            spark_version: "15.4.x-scala2.12"
+            num_workers: 0
+            node_type_id: ${var.node_type_id}
+            data_security_mode: USER_ISOLATION
+            spark_conf:
+              spark.master: "local[*]"
+              spark.databricks.cluster.profile: singleNode
+            custom_tags:
+              ResourceClass: SingleNode
+      tags:
+        project: zebpay
+        environment: ${var.environment}
+        managed_by: databricks-asset-bundles
+        purpose: deployment-setup
