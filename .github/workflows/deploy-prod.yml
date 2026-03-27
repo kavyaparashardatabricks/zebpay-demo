@@ -1,0 +1,56 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: databricks/setup-cli@main
+
+      - name: Validate prod bundle
+        run: databricks bundle validate --target prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.PROD_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}
+
+  deploy:
+    name: Deploy to Prod Workspace
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: databricks/setup-cli@main
+
+      - name: Deploy bundle to prod
+        run: databricks bundle deploy --target prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.PROD_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}
+
+      - name: Run setup job (ABAC + catalog)
+        run: |
+          databricks bundle run setup_catalog_and_abac --target prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.PROD_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}
+
+      - name: Run initial data pipeline
+        run: |
+          echo "To populate prod, manually trigger: databricks bundle run silver_layer_processing --target prod"
+          echo "Or unpause the schedule via the Databricks UI"
+        env:
+          DATABRICKS_HOST: ${{ secrets.PROD_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}

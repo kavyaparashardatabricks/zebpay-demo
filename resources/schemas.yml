@@ -1,0 +1,21 @@
+resources:
+  schemas:
+    bronze:
+      catalog_name: ${var.catalog}
+      name: ${var.bronze_schema}
+      comment: "Raw ingested data from source systems"
+
+    bronze_ingestion:
+      catalog_name: ${var.catalog}
+      name: ${var.bronze_ingestion_schema}
+      comment: "Lakeflow Connect CDC ingestion target"
+
+    silver:
+      catalog_name: ${var.catalog}
+      name: ${var.silver_schema}
+      comment: "Cleaned and enriched data with business logic (DLT managed)"
+
+    silver_secured:
+      catalog_name: ${var.catalog}
+      name: ${var.silver_secured_schema}
+      comment: "Silver tables with ABAC row filters and column masks"

@@ -1,0 +1,41 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-dev:
+    name: Validate Dev Target
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: databricks/setup-cli@main
+
+      - name: Validate dev bundle
+        run: databricks bundle validate --target dev
+        env:
+          DATABRICKS_HOST: ${{ secrets.DEV_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DEV_WORKSPACE_TOKEN }}
+
+  validate-prod:
+    name: Validate Prod Target
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: databricks/setup-cli@main
+
+      - name: Validate prod bundle
+        run: databricks bundle validate --target prod
+        env:
+          DATABRICKS_HOST: ${{ secrets.PROD_WORKSPACE_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.PROD_WORKSPACE_TOKEN }}

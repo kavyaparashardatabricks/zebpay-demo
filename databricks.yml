@@ -1,0 +1,59 @@
+bundle:
+  name: zebpay-demo
+
+workspace:
+  root_path: ~/.bundle/${bundle.name}/${bundle.target}
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-1138952c-c48b.cloud.databricks.com
+      profile: kp-zebpay-dev
+    variables:
+      catalog: zebpay
+      bronze_schema: bronze
+      silver_schema: silver
+      silver_secured_schema: silver_secured
+      bronze_ingestion_schema: bronze_ingestion
+      warehouse_id: 236169efad6e97bb
+      node_type_id: i3.xlarge
+      environment: dev
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-a8f8bec6-2c5f.cloud.databricks.com
+    run_as:
+      service_principal_name: zebpay-cicd-sp
+    variables:
+      catalog: zebpay
+      bronze_schema: bronze
+      silver_schema: silver
+      silver_secured_schema: silver_secured
+      bronze_ingestion_schema: bronze_ingestion
+      warehouse_id: ""  # To be configured after prod warehouse creation
+      node_type_id: i3.xlarge
+      environment: prod
+
+variables:
+  catalog:
+    description: Unity Catalog catalog name
+  bronze_schema:
+    description: Bronze layer schema
+  silver_schema:
+    description: Silver layer schema (DLT views)
+  silver_secured_schema:
+    description: Silver secured layer schema (ABAC tables)
+  bronze_ingestion_schema:
+    description: Lakeflow Connect ingestion target schema
+  warehouse_id:
+    description: SQL Warehouse ID for Genie and SQL operations
+  node_type_id:
+    description: Node type for job clusters
+  environment:
+    description: Environment name (dev/prod)
