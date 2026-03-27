@@ -13,7 +13,6 @@ targets:
     default: true
     workspace:
       host: https://dbc-1138952c-c48b.cloud.databricks.com
-      profile: kp-zebpay-dev
     variables:
       catalog: zebpay
       bronze_schema: bronze
