@@ -18,6 +18,7 @@
 # COMMAND ----------
 
 from pyspark.sql.functions import *
+from pyspark.sql.window import Window
 from pyspark.sql.types import *
 from datetime import datetime
 
@@ -101,8 +102,6 @@ print(f"  Silver users count: {final_count}")
 # MAGIC ## Step 2: Process Trades (Bronze → Silver)
 
 # COMMAND ----------
-
-from pyspark.sql.window import Window
 
 print("Processing raw_trades → trades")
 
