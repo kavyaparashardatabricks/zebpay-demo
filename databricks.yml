@@ -28,14 +28,20 @@ targets:
     workspace:
       host: https://dbc-a8f8bec6-2c5f.cloud.databricks.com
     run_as:
-      service_principal_name: zebpay-cicd-sp
+      service_principal_name: 575a65fe-f108-4524-be33-5fbc35d223a6
+    resources:
+      pipelines:
+        lakeflow_connect_ingestion:
+          development: false
+        bronze_to_silver:
+          development: false
     variables:
       catalog: zebpay
       bronze_schema: bronze
       silver_schema: silver
       silver_secured_schema: silver_secured
       bronze_ingestion_schema: bronze_ingestion
-      warehouse_id: ""  # To be configured after prod warehouse creation
+      warehouse_id: 3e0a29d0c89e74a4
       node_type_id: i3.xlarge
       environment: prod
 
